@@ -20,14 +20,14 @@
     <meta property="og:site_name" content="Western Multiservices &amp; iClick">
     <meta property="og:title" content="Western Multiservices &amp; iClick | Siempre listos para ayudarte">
     <meta property="og:description" content="19 servicios en un solo lugar: impuestos, notario, migración, seguros, placas y celulares. Garland, Dallas y Grand Prairie.">
-    <meta property="og:image" content="img/web/og-image.jpg">
+    <meta property="og:image" content="img/web/og-wms-iclick.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Logotipo de Western Multiservices &amp; iClick">
+    <meta property="og:image:alt" content="Logotipos de Western Multiservices y de iClick">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Western Multiservices &amp; iClick | Siempre listos para ayudarte">
     <meta name="twitter:description" content="Impuestos, notario, migración, seguros y celulares en un solo lugar. Atención en español.">
-    <meta name="twitter:image" content="img/web/og-image.jpg">
+    <meta name="twitter:image" content="img/web/og-wms-iclick.jpg">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23330c12'/%3E%3Cpath d='M50 14 60.6 41.4 91.9 42.4 67.1 61.6 75.9 91.6 50 74 24.1 91.6 32.9 61.6 8.1 42.4 39.4 41.4Z' fill='%23e8b84a'/%3E%3C/svg%3E">
 
@@ -37,7 +37,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
-    <link rel="preload" as="image" href="img/web/logo.webp" type="image/webp">
+    <link rel="preload" as="image" href="img/web/logo-wms.webp" type="image/webp">
     <link rel="stylesheet" href="styles.css">
 
     <!-- ═══════ Datos estructurados ═══════ -->
@@ -50,7 +50,7 @@
           "@id": "#organizacion",
           "name": "Western Multiservices & iClick",
           "slogan": "Siempre listos para ayudarte",
-          "logo": "img/web/logo.webp",
+          "logo": "img/web/logo-wms.webp",
           "telephone": "+1-214-258-5434",
           "email": "Westernservices2022@gmail.com",
           "knowsLanguage": ["es", "en"],
@@ -135,7 +135,7 @@
     <div class="hdr-in">
         <a href="#inicio" class="brand" aria-label="Western Multiservices, inicio">
             <span class="brand-mark"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#star"/></svg></span>
-            <span class="brand-txt"><b>Western</b><i>Multiservices</i></span>
+            <span class="brand-txt notranslate" translate="no"><b>Western</b><i>Multiservices</i></span>
         </a>
         <nav class="nav" aria-label="Principal">
             <a href="#servicios">Servicios</a>
@@ -143,10 +143,19 @@
             <a href="#oficinas">Oficinas</a>
             <a href="#preguntas">Preguntas</a>
         </nav>
-        <a class="btn btn-gold btn-sm hdr-cta" href="https://wa.me/12142585434" target="_blank" rel="noopener" data-wa="Hola Western Multiservices, quiero mi cita. ¿Me pueden ayudar?" data-magnetic>
-            <i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i><span>Quiero mi cita</span>
-        </a>
-        <button class="burger" id="burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+        <div class="hdr-end">
+            <!-- Idioma: el sitio se escribe solo en español y Google lo traduce en el navegador (ver app.js, sección 11) -->
+            <div class="lang notranslate" id="lang" translate="no" role="group" aria-label="Idioma / Language" hidden>
+                <i class="ph ph-translate" aria-hidden="true"></i>
+                <button class="lang-b is-on" type="button" data-lang="es" lang="es" aria-pressed="true" aria-label="Español">ES</button>
+                <button class="lang-b" type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English">EN</button>
+                <button class="lang-b" type="button" data-lang="" id="lang-x" aria-pressed="false" hidden></button>
+            </div>
+            <a class="btn btn-gold btn-sm hdr-cta" href="https://wa.me/12142585434" target="_blank" rel="noopener" data-wa="Hola Western Multiservices, quiero mi cita. ¿Me pueden ayudar?" data-magnetic>
+                <i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i><span>Quiero mi cita</span>
+            </a>
+            <button class="burger" id="burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+        </div>
     </div>
 </header>
 
@@ -216,7 +225,7 @@
             </div>
             <div class="badge" id="badge">
                 <div class="badge-float">
-                    <img class="badge-img" src="img/web/logo.webp" width="1200" height="794" alt="Logotipo de Western Multiservices & iClick: letrero vaquero con sombrero, bota y girasoles" fetchpriority="high">
+                    <img class="badge-img" src="img/web/logo-wms.webp" width="1200" height="564" alt="Logotipo de Western Multiservices: letrero vaquero con sombrero, bota y girasoles" fetchpriority="high">
                     <span class="badge-sheen" aria-hidden="true"></span>
                 </div>
             </div>
@@ -271,7 +280,7 @@
             <div class="finder-field">
                 <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
                 <input id="q" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="q-list" aria-autocomplete="list" placeholder="">
-                <span class="finder-type" id="q-type" aria-hidden="true"></span>
+                <span class="finder-type notranslate" id="q-type" translate="no" aria-hidden="true"></span>
                 <button class="finder-clear" id="q-clear" type="button" aria-label="Borrar búsqueda" hidden><i class="ph ph-x" aria-hidden="true"></i></button>
             </div>
             <div class="finder-chips" role="group" aria-label="Búsquedas frecuentes">
@@ -478,11 +487,37 @@
             <h2 id="h-oficina" class="h2">Una oficina de verdad,<br><em>con gente de verdad.</em></h2>
         </div>
         <div class="exp-media" data-exp-media>
-            <img src="img/web/oficina-ancha.webp" width="1600" height="1066" alt="Asesora de Western Multiservices atendiendo en su escritorio, con el letrero de servicios de notaría e impuestos al fondo" loading="lazy">
+            <img src="img/web/asesora-salon-ancha.webp" width="1153" height="1600" alt="Asesora de Western Multiservices sonriendo, con traje plateado y un ramo de rosas rojas, en un salón con sillón de cuero y espejo dorado" loading="lazy">
             <div class="exp-shade" aria-hidden="true"></div>
         </div>
         <div class="exp-text" data-exp-text>
             <p class="exp-big"><span>Pasa a saludarnos.</span> Aquí te atiende una persona, de frente y en español.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ 6b. GENTE: las personas que te atienden ═══════ -->
+<section class="faces" id="gente" aria-labelledby="h-faces">
+    <div class="wrap">
+        <div class="faces-head" data-reveal>
+            <h2 id="h-faces" class="h2">Conoce a quien<br><em>te atiende.</em></h2>
+            <p class="sub">Detrás de cada trámite hay una persona que te escucha, te explica con calma y te acompaña hasta que quede listo.</p>
+        </div>
+
+        <div class="faces-gal" data-stagger role="region" aria-label="Galería de fotos" tabindex="0">
+            <figure data-reveal><img src="img/web/asesora-libreria.webp" width="720" height="960" alt="Asesora de Western Multiservices con traje plateado, leyendo un libro rojo junto a un librero iluminado" loading="lazy"></figure>
+            <figure data-reveal><img src="img/web/asesora-terciopelo.webp" width="720" height="960" alt="Retrato de una asesora de Western Multiservices sonriendo, con saco de terciopelo verde" loading="lazy"></figure>
+            <figure data-reveal><img src="img/web/asesora-reflector.webp" width="720" height="960" alt="Asesora de Western Multiservices con un ramo de rosas rojas dentro de un círculo de luz" loading="lazy"></figure>
+            <figure data-reveal><img src="img/web/asesora-flores.webp" width="720" height="960" alt="Asesora de Western Multiservices con saco azul frente a una pared de flores rosas" loading="lazy"></figure>
+            <figure data-reveal><img src="img/web/asesora-espejos.webp" width="720" height="960" alt="Asesora de Western Multiservices con traje plateado, recargada junto a espejos dorados" loading="lazy"></figure>
+            <figure data-reveal><img src="img/web/asesora-corona.webp" width="720" height="960" alt="Retrato de una asesora de Western Multiservices con corona negra y rosas rojas" loading="lazy"></figure>
+            <figure data-reveal><img src="img/web/asesora-traje-verde.webp" width="720" height="960" alt="Asesora de Western Multiservices con traje de terciopelo verde frente a un fondo claro" loading="lazy"></figure>
+            <a class="faces-go" href="https://wa.me/12142585434" target="_blank" rel="noopener" data-reveal data-wa="Hola Western Multiservices, quiero hablar con una persona. ¿Me pueden ayudar?">
+                <i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i>
+                <h3>Hablemos de tu trámite</h3>
+                <p>Cuéntanos qué necesitas y te respondemos por WhatsApp.</p>
+                <span class="bx-go">Escríbenos <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>
+            </a>
         </div>
     </div>
 </section>
@@ -523,7 +558,7 @@
 
         <div class="bento" data-stagger>
             <div class="bx bx-img" data-reveal data-tilt>
-                <img src="img/web/iclick-logo.webp" width="1000" height="879" alt="Logotipo de iClick: sombrero, bota vaquera, girasoles y un celular con la pantalla estrellada" loading="lazy">
+                <img src="img/web/logo-iclick.webp" width="800" height="901" alt="Logotipo de iClick: sombrero, bota vaquera, girasoles y un celular con la pantalla estrellada" loading="lazy">
             </div>
 
             <a class="bx bx-gold" href="https://wa.me/12142585434" target="_blank" rel="noopener" data-reveal data-spot data-wa="Hola iClick, quiero mi celular liberado. ¿Qué modelos tienen?" data-service="Celulares liberados" data-group="iClick" data-keys="celular telefono liberado unlocked phone cualquier compania comprar telefono nuevo">
@@ -651,10 +686,10 @@
         <div class="of-grid" data-reveal>
             <div class="of-tabs" role="tablist" aria-label="Oficinas" aria-orientation="vertical">
                 <button class="of-tab is-on" role="tab" id="tab-0" aria-selected="true" aria-controls="of-0" type="button">
-                    <span class="of-city">Garland</span><span class="of-name">Western Multiservices</span><i class="ph ph-arrow-right" aria-hidden="true"></i>
+                    <span class="of-city">Garland</span><span class="of-name notranslate" translate="no">Western Multiservices</span><i class="ph ph-arrow-right" aria-hidden="true"></i>
                 </button>
                 <button class="of-tab" role="tab" id="tab-1" aria-selected="false" aria-controls="of-1" type="button" tabindex="-1">
-                    <span class="of-city">Dallas</span><span class="of-name">Western Multiservices</span><i class="ph ph-arrow-right" aria-hidden="true"></i>
+                    <span class="of-city">Dallas</span><span class="of-name notranslate" translate="no">Western Multiservices</span><i class="ph ph-arrow-right" aria-hidden="true"></i>
                 </button>
                 <button class="of-tab" role="tab" id="tab-2" aria-selected="false" aria-controls="of-2" type="button" tabindex="-1">
                     <span class="of-city">Garland</span><span class="of-name">iClick, celulares</span><i class="ph ph-arrow-right" aria-hidden="true"></i>
@@ -670,8 +705,8 @@
                 </div>
 
                 <div class="of-panel is-on" role="tabpanel" id="of-0" aria-labelledby="tab-0" data-map="https://www.google.com/maps?q=2918+S+Jupiter+Rd+Suite+L4+Garland+TX&amp;output=embed" data-dir="2918 S Jupiter Rd Suite L4 Garland TX 75041" data-office="Garland, Western Multiservices">
-                    <h3>Western Multiservices, Garland</h3>
-                    <address>2918 S Jupiter Rd, Suite L4<br>Garland, TX 75041<br><span>En Bolsa Bazar.</span></address>
+                    <h3 class="notranslate" translate="no">Western Multiservices, Garland</h3>
+                    <address>2918 S Jupiter Rd, Suite L4<br>Garland, TX 75041<br><span>En<span class="notranslate" translate="no"> Bolsa Bazar</span>.</span></address>
                     <p class="of-tag">Trámites y servicios</p>
                     <div class="of-actions">
                         <a class="btn btn-gold" href="tel:+12142585434"><i class="ph-fill ph-phone" aria-hidden="true"></i><span>(214) 258-5434</span></a>
@@ -680,8 +715,8 @@
                 </div>
 
                 <div class="of-panel" role="tabpanel" id="of-1" aria-labelledby="tab-1" hidden data-map="https://www.google.com/maps?q=1515+S+Buckner+Blvd+Suite+301+Dallas+TX+75217&amp;output=embed" data-dir="1515 S Buckner Blvd Suite 301 Dallas TX 75217" data-office="Dallas, Western Multiservices">
-                    <h3>Western Multiservices, Dallas</h3>
-                    <address>1515 S Buckner Blvd, Suite 301<br>Dallas, TX 75217<br><span>Dentro del supermercado El Rancho.</span></address>
+                    <h3 class="notranslate" translate="no">Western Multiservices, Dallas</h3>
+                    <address>1515 S Buckner Blvd, Suite 301<br>Dallas, TX 75217<br><span>Dentro del supermercado<span class="notranslate" translate="no"> El Rancho</span>.</span></address>
                     <p class="of-tag">Trámites y servicios</p>
                     <div class="of-actions">
                         <a class="btn btn-gold" href="tel:+19453983464"><i class="ph-fill ph-phone" aria-hidden="true"></i><span>(945) 398-3464</span></a>
@@ -690,7 +725,7 @@
                 </div>
 
                 <div class="of-panel" role="tabpanel" id="of-2" aria-labelledby="tab-2" hidden data-map="https://www.google.com/maps?q=2918+S+Jupiter+Rd+Suite+B1+Garland+TX+75041&amp;output=embed" data-dir="2918 S Jupiter Rd Suite B1 Garland TX 75041" data-office="Garland, iClick">
-                    <h3>iClick, Garland</h3>
+                    <h3 class="notranslate" translate="no">iClick, Garland</h3>
                     <address>2918 S Jupiter Rd, Suite B1<br>Garland, TX 75041</address>
                     <p class="of-tag">Celulares, reparaciones y servicios</p>
                     <div class="of-actions">
@@ -700,7 +735,7 @@
                 </div>
 
                 <div class="of-panel" role="tabpanel" id="of-3" aria-labelledby="tab-3" hidden data-map="https://www.google.com/maps?q=2506+S+Belt+Line+Rd+Grand+Prairie+TX&amp;output=embed" data-dir="2506 S Belt Line Rd Grand Prairie TX" data-office="Grand Prairie, iClick">
-                    <h3>iClick, Grand Prairie</h3>
+                    <h3 class="notranslate" translate="no">iClick, Grand Prairie</h3>
                     <address>2506 S Belt Line Rd<br>Grand Prairie, TX</address>
                     <p class="of-tag">Celulares, reparaciones y servicios</p>
                     <div class="of-actions">
@@ -828,11 +863,14 @@
 
 <!-- ═══════ FOOTER ═══════ -->
 <footer class="ft">
-    <div class="ft-word" aria-hidden="true"><span id="ft-word">WESTERN</span></div>
+    <div class="ft-word notranslate" translate="no" aria-hidden="true"><span id="ft-word">WESTERN</span></div>
     <div class="wrap">
         <div class="ft-top">
             <div class="ft-brand">
-                <img src="img/web/logo-sm.webp" width="560" height="370" alt="Western Multiservices & iClick" loading="lazy">
+                <div class="ft-logos">
+                    <img class="ft-wms" src="img/web/logo-wms-sm.webp" width="560" height="263" alt="Western Multiservices" loading="lazy">
+                    <img class="ft-ick" src="img/web/logo-iclick-sm.webp" width="260" height="293" alt="iClick" loading="lazy">
+                </div>
                 <p>Siempre listos para ayudarte. Impuestos, trámites, seguros y celulares en Garland, Dallas y Grand Prairie.</p>
             </div>
             <div class="ft-col">
@@ -875,6 +913,18 @@
     <span class="wa-tip" id="wa-tip">¿Hablamos?</span>
     <span class="wa-btn"><i class="ph-fill ph-whatsapp-logo" aria-hidden="true"></i></span>
 </a>
+
+<!-- ═══════ AVISO DE TRADUCCIÓN: se muestra solo si el dispositivo no está en español ═══════ -->
+<div class="tr-bar notranslate" id="tr-bar" translate="no" role="region" aria-live="polite" hidden>
+    <span class="tr-ic" aria-hidden="true"><i class="ph ph-translate"></i></span>
+    <p class="tr-msg" id="tr-msg"></p>
+    <div class="tr-act">
+        <button class="btn btn-gold btn-sm" id="tr-yes" type="button"></button>
+        <button class="btn btn-ghost btn-sm" id="tr-no" type="button"></button>
+    </div>
+</div>
+<!-- Google Translate se monta aquí (oculto). Su script solo se descarga cuando el visitante pide traducir. -->
+<div id="google_translate_element" aria-hidden="true"></div>
 
 <noscript><style>.ld-door,#loader{display:none!important}.q-a{grid-template-rows:1fr!important}</style></noscript>
 

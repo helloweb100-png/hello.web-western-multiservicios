@@ -260,6 +260,58 @@ address { font-style: normal; }
 
 .nav { display: none; }
 .hdr-cta { display: none; }
+.hdr-end { display: flex; align-items: center; gap: 8px; }
+
+/* Selector de idioma ES | EN (+ un tercer botón si el visitante traduce a otro idioma) */
+.lang {
+    display: flex; align-items: center; gap: 2px; flex: none;
+    height: 42px; padding: 0 4px 0 11px;
+    border-radius: 999px; border: 1px solid var(--line-2);
+    background: rgba(244, 230, 198, .04);
+}
+.lang > i { font-size: 17px; color: var(--gold); margin-right: 4px; }
+.lang-b {
+    min-width: 36px; height: 32px; padding: 0 9px; border-radius: 999px;
+    font: 600 12px/1 var(--ff-m); letter-spacing: .06em; color: var(--mut);
+    transition: color .3s, background .3s, box-shadow .3s;
+}
+.lang-b:hover { color: var(--cream); }
+.lang-b.is-on { color: var(--ink); background: linear-gradient(180deg, var(--gold-hi), var(--gold) 60%, var(--gold-lo)); box-shadow: inset 0 0 0 1px rgba(255, 236, 170, .4); }
+.lang.is-busy .lang-b.is-on { animation: busy 1s ease-in-out infinite; }
+.lang.is-busy .lang-b { pointer-events: none; }
+@keyframes busy { 50% { opacity: .45; } }
+@media (max-width: 379px) { .lang > i { display: none; } .lang { padding-left: 4px; } }
+@media (max-width: 339px) { .brand-mark { display: none; } .lang-b { min-width: 32px; padding: 0 7px; } } /* pantallas muy angostas: caben marca + idioma + menú */
+
+/* Aviso: "esta página está en español, ¿quieres traducirla?" (esquina inferior izquierda; WhatsApp va a la derecha) */
+.tr-bar {
+    position: fixed; z-index: 85;
+    left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom));
+    right: 88px; max-width: 420px;
+    display: grid; grid-template-columns: auto 1fr; gap: 12px 14px; align-items: center;
+    padding: 16px 18px;
+    border-radius: var(--r-m);
+    background: rgba(21, 9, 12, .94); border: 1px solid rgba(232, 184, 74, .5);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .85), 0 0 40px -14px rgba(232, 184, 74, .35);
+    color: var(--cream);
+    opacity: 0; transform: translateY(26px);
+    transition: opacity .6s var(--ease), transform .7s var(--ease);
+}
+.tr-bar.is-in { opacity: 1; transform: none; }
+.tr-ic { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; color: var(--gold-hi); background: linear-gradient(145deg, var(--wine-2), var(--wine-d)); box-shadow: inset 0 0 0 1px rgba(232, 184, 74, .3); }
+.tr-msg { font-size: 14.5px; line-height: 1.45; }
+.tr-act { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.tr-act .btn { --h: 40px; font-size: 14px; padding: 0 18px; }
+@media (min-width: 900px) { .tr-bar { left: 24px; bottom: 24px; } }
+
+/* Google Translate: usamos nuestro propio selector, así que ocultamos su barra superior,
+   sus globos con el texto original y el desplazamiento que le mete al <body>. */
+body > .skiptranslate, iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame,
+[class*="VIpgJd-ZVi9od"], [class*="VIpgJd-yAWNEb"] { display: none !important; }
+body { top: 0 !important; }
+.goog-text-highlight { background: none !important; box-shadow: none !important; }
+#google_translate_element { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); pointer-events: none; }
 
 .burger { width: 46px; height: 46px; border-radius: 50%; display: grid; place-content: center; gap: 6px; border: 1px solid var(--line-2); }
 .burger span { display: block; width: 18px; height: 2px; background: var(--cream); border-radius: 2px; transition: transform .5s var(--ease); }
@@ -368,7 +420,7 @@ html.loading .stage { opacity: 0; transform: scale(.86); animation: hFail .01s 9
 
 .badge {
     position: absolute; left: 50%; top: 50%; translate: -50% -50%;
-    width: 64%;
+    width: 76%;
     transform-style: preserve-3d;
     transform: translate3d(calc(var(--px) * 14px), calc(var(--py) * 12px), 0) rotateY(calc(var(--px) * 12deg)) rotateX(calc(var(--py) * -10deg));
     will-change: transform;
@@ -376,7 +428,8 @@ html.loading .stage { opacity: 0; transform: scale(.86); animation: hFail .01s 9
 .badge-float { position: relative; animation: float 7s ease-in-out infinite; }
 .badge-img { width: 100%; filter: drop-shadow(0 26px 34px rgba(0, 0, 0, .65)) drop-shadow(0 0 22px rgba(232, 184, 74, .22)); }
 .badge-sheen {
-    position: absolute; inset: 6% 3%; border-radius: 12% / 22%;
+    position: absolute; inset: 0;
+    -webkit-mask: url("img/web/logo-wms.webp") center / 100% 100% no-repeat; mask: url("img/web/logo-wms.webp") center / 100% 100% no-repeat; /* el brillo solo se ve sobre el letrero */
     background: linear-gradient(105deg, transparent 38%, rgba(255, 246, 220, .85) 50%, transparent 62%);
     background-size: 320% 100%; background-position: 130% 0;
     mix-blend-mode: overlay;
@@ -523,7 +576,7 @@ html.loading .stage { opacity: 0; transform: scale(.86); animation: hFail .01s 9
 .exp-stage { position: relative; height: 100dvh; min-height: 560px; overflow: hidden; }
 .exp-lead { position: absolute; left: 0; right: 0; top: 0; z-index: 3; padding: clamp(56px, 11vh, 120px) var(--gut) 0; text-align: center; pointer-events: none; will-change: transform, opacity; }
 .exp-media { position: absolute; inset: 0; clip-path: inset(34% 7% 9% 7% round var(--r-l)); will-change: clip-path; }
-.exp-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; transform: scale(1.18); will-change: transform; }
+.exp-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; transform: scale(1.18); will-change: transform; }
 .exp-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15, 6, 8, .1) 30%, rgba(15, 6, 8, .82)); opacity: .45; will-change: opacity; }
 .exp-text { position: absolute; left: 0; right: 0; bottom: clamp(36px, 10vh, 110px); z-index: 3; padding: 0 var(--gut); opacity: 0; will-change: opacity, transform; }
 .exp-big { width: min(100%, var(--max)); margin-inline: auto; font: 600 clamp(1.45rem, 4.4vw, 3.3rem)/1.12 var(--ff-d); letter-spacing: -.03em; color: var(--cream); text-wrap: balance; }
@@ -532,6 +585,39 @@ html:not(.has-gsap) .exp-stage { height: auto; min-height: 0; padding-bottom: 40
 html:not(.has-gsap) .exp-lead { position: static; padding-bottom: 24px; }
 html:not(.has-gsap) .exp-media { position: relative; height: 60vh; clip-path: none; }
 html:not(.has-gsap) .exp-text { position: static; opacity: 1; padding-top: 24px; }
+
+/* ---------- 11b. Gente: fotos de quienes te atienden ---------- */
+.faces { padding: var(--sec) 0; background: var(--bg-2); }
+.faces-head { display: grid; gap: 18px; margin-bottom: clamp(30px, 5vw, 60px); }
+/* Móvil: tira horizontal con imán (la siguiente foto asoma para invitar a deslizar). Escritorio: cuadrícula */
+.faces-gal {
+    display: flex; gap: 12px;
+    margin-inline: calc(var(--gut) * -1); padding: 4px var(--gut) 20px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gut);
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.faces-gal::-webkit-scrollbar { display: none; }
+.faces-gal > * { flex: 0 0 min(66vw, 270px); scroll-snap-align: start; }
+.faces-gal figure {
+    position: relative; aspect-ratio: 3 / 4; overflow: hidden;
+    border-radius: var(--r-m); background: var(--bg-3);
+    box-shadow: 0 0 0 1px rgba(232, 184, 74, .22), 0 34px 54px -30px rgba(0, 0, 0, .9);
+}
+.faces-gal figure::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 62%, rgba(15, 6, 8, .38)); }
+.faces-gal img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.3s var(--ease); }
+.faces-gal figure:hover img { transform: scale(1.06); }
+.faces-go {
+    display: flex; flex-direction: column; gap: 10px; aspect-ratio: 3 / 4; padding: 24px;
+    border-radius: var(--r-m); color: var(--ink);
+    background: linear-gradient(150deg, var(--gold-hi), var(--gold) 50%, var(--gold-lo));
+    transition: translate .6s var(--ease);
+}
+.faces-go > i { font-size: 38px; color: var(--wine); margin-bottom: auto; }
+.faces-go h3 { font: 700 clamp(1.35rem, 2vw, 1.7rem)/1.06 var(--ff-d); letter-spacing: -.03em; }
+.faces-go p { font-size: 15px; line-height: 1.45; color: rgba(26, 11, 14, .78); max-width: 22ch; }
+.faces-go .bx-go { margin-top: 6px; padding-top: 0; }
+.faces-go:hover { translate: 0 -4px; }
+.faces-go:hover .bx-go i { transform: translate(3px, -3px); }
 
 /* ---------- 12. Recorrido ---------- */
 .tour { padding: var(--sec) 0; background: linear-gradient(180deg, var(--bg-2), var(--bg)); }
@@ -567,8 +653,13 @@ html:not(.has-gsap) .exp-text { position: static; opacity: 1; padding-top: 24px;
 a.bx:hover { translate: 0 -4px; }
 a.bx:hover .bx-go i { transform: translate(3px, -3px); }
 
-.bx-img { padding: 0; min-height: 0; aspect-ratio: 1000 / 879; background: #2a1612; box-shadow: 0 0 0 1px rgba(232, 184, 74, .3), 0 40px 70px -30px rgba(0, 0, 0, .8); }
-.bx-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+/* El logo de iClick es vertical y transparente: vive sobre vino + un resplandor dorado, sin recortarse */
+.bx-img {
+    padding: 0; min-height: 0; aspect-ratio: 1 / 1;
+    background: radial-gradient(68% 60% at 50% 46%, rgba(232, 184, 74, .3), transparent 72%), linear-gradient(160deg, var(--wine-2), var(--wine-d) 72%, #1a0a0d);
+    box-shadow: 0 0 0 1px rgba(232, 184, 74, .3), 0 40px 70px -30px rgba(0, 0, 0, .8);
+}
+.bx-img img { position: absolute; inset: 5%; width: 90%; height: 90%; object-fit: contain; filter: drop-shadow(0 18px 26px rgba(0, 0, 0, .55)); }
 .bx-gold { color: var(--ink); background: linear-gradient(150deg, var(--gold-hi), var(--gold) 50%, var(--gold-lo)); }
 .bx-gold p { color: rgba(26, 11, 14, .78); }
 .bx-gold > i { color: var(--wine); }
@@ -709,7 +800,10 @@ html:not(.has-gsap) .steps-line span { transform: none; }
 .ft-word span { display: block; width: max-content; margin-inline: auto; font: 800 clamp(4rem, 21vw, 22rem)/.82 var(--ff-d); letter-spacing: -.055em; color: transparent; background: linear-gradient(180deg, rgba(232, 184, 74, .34), rgba(232, 184, 74, .03) 85%); -webkit-background-clip: text; background-clip: text; padding-bottom: .06em; white-space: nowrap; will-change: transform; }
 .ft-top { display: grid; gap: 32px; padding-bottom: 36px; }
 .ft-brand { display: grid; gap: 16px; max-width: 360px; }
-.ft-brand img { width: 220px; }
+.ft-logos { display: flex; align-items: center; gap: 18px; }
+.ft-brand img { height: auto; }
+.ft-wms { width: 200px; }
+.ft-ick { width: 84px; }
 .ft-brand p { color: var(--mut); font-size: 15px; }
 .ft-col h3 { font: 500 12px/1 var(--ff-m); letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
 .ft-col ul { display: grid; gap: 11px; }
@@ -770,7 +864,7 @@ html.loading .wa-float { opacity: 0; transform: translateY(30px); }
 
 @media (min-width: 700px) {
     .bento { grid-template-columns: repeat(2, 1fr); }
-    .bx-img { grid-column: 1 / 3; }
+    .bx-img { grid-column: 1 / 3; aspect-ratio: 6 / 5; }
     .bx-photo { min-height: 330px; }
     .clear-grid { grid-template-columns: 1.25fr 1fr; }
     .clear-warn { grid-row: 1 / 3; padding: 38px; }
@@ -819,6 +913,10 @@ html.loading .wa-float { opacity: 0; transform: translateY(30px); }
     html:not(.has-gsap) .pan-bar { display: none; }
 
     .exp-media { clip-path: inset(30% 24% 8% 24% round var(--r-l)); }
+
+    .faces-head { grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); align-items: end; gap: clamp(24px, 5vw, 80px); }
+    .faces-gal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-inline: 0; padding: 0 0 34px; overflow: visible; }
+    .faces-gal > :nth-child(4n + 2), .faces-gal > :nth-child(4n) { margin-top: 34px; }
 
     .tour-grid { grid-template-columns: minmax(280px, .8fr) 1.2fr; gap: clamp(40px, 7vw, 110px); }
     .tour-copy { order: 0; }

@@ -14,6 +14,7 @@
      8. Buscador de servicios
      9. Oficinas, FAQ, video, formulario
     10. Efectos de puntero (tilt, spotlight, magnético)
+    11. Traducción automática (Google Website Translator)
    ========================================================================== */
 (() => {
     'use strict';
@@ -33,7 +34,14 @@
 
     let lenis = null;
     let heroVisible = true;
+    let offerTranslate = null; // lo define initTranslate(); se llama cuando el sitio ya abrió
     const loops = new Set(); // funciones que corren cada frame
+
+    // Idioma en el que se está mostrando la página ('es' = original). Lo cambia initTranslate().
+    // T() elige entre español e inglés los textos que el propio JS escribe en pantalla,
+    // porque Google solo traduce el DOM que existe, no las cadenas que armamos después.
+    const state = { lang: 'es' };
+    const T = (es, en) => (state.lang === 'es' ? es : en);
 
     if (animate) {
         gsap.registerPlugin(ScrollTrigger);
@@ -101,7 +109,7 @@
     const menu = $('#menu');
     function setMenu(open) {
         burger.setAttribute('aria-expanded', String(open));
-        burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        burger.setAttribute('aria-label', open ? T('Cerrar menú', 'Close menu') : T('Abrir menú', 'Open menu'));
         menu.classList.toggle('is-open', open);
         menu.setAttribute('aria-hidden', String(!open));
         document.body.classList.toggle('is-locked', open);
@@ -419,6 +427,31 @@
         ScrollTrigger.refresh();
     }
 
+    // Manifiesto: cada palabra se enciende con el scroll
+    let wordTween = null;
+    function revealWords() {
+        const words = $$('.manifesto-txt .w');
+        if (!animate || !words.length) return;
+        wordTween = gsap.to(words, {
+            opacity: 1, ease: 'none', stagger: .12,
+            scrollTrigger: { trigger: '.manifesto-txt', start: 'top 80%', end: 'bottom 50%', scrub: .5 }
+        });
+    }
+    // Google traduce por bloque de texto: con una <span> por palabra la frase sale desordenada.
+    // Mientras la página está traducida el manifiesto va como texto corrido; al volver a español se recupera el efecto.
+    function flattenWords() {
+        const el = $('[data-words]');
+        if (!el || !$('.w', el)) return;
+        if (wordTween) { wordTween.scrollTrigger.kill(); wordTween.kill(); wordTween = null; }
+        el.textContent = el.textContent.replace(/\s+/g, ' ').trim();
+    }
+    function restoreWords() {
+        const el = $('[data-words]');
+        if (!el || $('.w', el)) return;
+        prepareText(); revealWords();
+        if (animate) ScrollTrigger.refresh();
+    }
+
     function initScrollAnimations() {
         if (!animate) {
             // Sin GSAP: todo visible, sin pins
@@ -474,13 +507,7 @@
 
         // --- A partir de aquí, nada se fija: se crean después de los pins para que midan bien
         // Manifiesto: palabra por palabra
-        const words = $$('.manifesto-txt .w');
-        if (words.length) {
-            gsap.to(words, {
-                opacity: 1, ease: 'none', stagger: .12,
-                scrollTrigger: { trigger: '.manifesto-txt', start: 'top 80%', end: 'bottom 50%', scrub: .5 }
-            });
-        }
+        revealWords();
 
         // Contadores
         $$('[data-count]').forEach((el) => {
@@ -542,21 +569,29 @@
         const items = $$('[data-service]').map((el) => {
             const ic = el.querySelector('i');
             return {
-                name: el.dataset.service, group: el.dataset.group,
+                el, name: el.dataset.service, group: el.dataset.group,
                 keys: norm(`${el.dataset.service} ${el.dataset.keys || ''} ${el.dataset.group}`),
                 icon: ic ? Array.from(ic.classList).find((c) => c.startsWith('ph-') && c !== 'ph-fill') : 'ph-star-four',
                 msg: el.dataset.wa
             };
         });
+        // Google no traduce lo que se inserta después de traducir la página. Si está traducida,
+        // los resultados toman el texto que ya tiene la tarjeta del servicio en el DOM.
+        const labelOf = (it) => {
+            if (state.lang === 'es') return { name: it.name, group: it.group };
+            const t = it.el.querySelector('.svc-t, h3'), p = it.el.closest('.panel'), g = p && p.querySelector('.panel-head h3');
+            return { name: (t && t.textContent.trim()) || it.name, group: (g && g.textContent.trim()) || it.group };
+        };
 
         let active = -1, shown = [];
+        const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
         const highlight = (name, tokens) => {
             const n = norm(name);
             for (const t of tokens) {
                 const i = n.indexOf(t);
-                if (i > -1) return `${name.slice(0, i)}<mark>${name.slice(i, i + t.length)}</mark>${name.slice(i + t.length)}`;
+                if (i > -1) return `${esc(name.slice(0, i))}<mark>${esc(name.slice(i, i + t.length))}</mark>${esc(name.slice(i + t.length))}`;
             }
-            return name;
+            return esc(name);
         };
 
         const render = () => {
@@ -573,7 +608,7 @@
             const tokens = q.split(/\s+/).filter(Boolean);
             shown = items
                 .filter((it) => tokens.every((t) => it.keys.includes(t)))
-                .map((it) => ({ it, score: (norm(it.name).startsWith(tokens[0]) ? 3 : 0) + (norm(it.name).includes(tokens[0]) ? 2 : 0) + 1 }))
+                .map((it) => { const n = norm(labelOf(it).name); return { it, score: (n.startsWith(tokens[0]) ? 3 : 0) + (n.includes(tokens[0]) ? 2 : 0) + 1 }; })
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 8).map((o) => o.it);
 
@@ -585,11 +620,12 @@
             const frag = document.createDocumentFragment();
             shown.forEach((it, i) => {
                 const li = document.createElement('li');
+                const { name, group } = labelOf(it);
                 li.setAttribute('role', 'option'); li.id = `q-opt-${i}`;
                 li.innerHTML = `<a href="${waLink(it.msg)}" target="_blank" rel="noopener">
                     <span class="f-ic"><i class="ph ${it.icon}" aria-hidden="true"></i></span>
-                    <span><span class="f-t">${highlight(it.name, tokens)}</span><span class="f-g">${it.group}</span></span>
-                    <span class="f-go">Preguntar por este servicio <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span></a>`;
+                    <span><span class="f-t">${highlight(name, tokens)}</span><span class="f-g">${esc(group)}</span></span>
+                    <span class="f-go">${T('Preguntar por este servicio', 'Ask about this service')} <i class="ph ph-arrow-up-right" aria-hidden="true"></i></span></a>`;
                 frag.appendChild(li);
             });
             list.appendChild(frag);
@@ -611,7 +647,7 @@
         };
 
         input.addEventListener('input', render);
-        input.addEventListener('focus', () => { input.placeholder = 'Ej. renovar mi ITIN'; });
+        input.addEventListener('focus', () => { input.placeholder = T('Ej. renovar mi ITIN', 'e.g. income tax'); });
         input.addEventListener('blur', () => { input.placeholder = ''; });
         input.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
@@ -627,12 +663,19 @@
         }));
 
         // Máquina de escribir: ejemplos de lo que la gente suele pedir
-        const phrases = ['renovar mi ITIN', 'cita en el consulado', 'placas para mi carro', 'seguro de auto', 'reparar mi pantalla', 'declarar mis impuestos', 'abrir mi LLC', 'un celular liberado'];
-        if (reduce) { typeEl.textContent = phrases[0]; return; }
-        let pi = 0, ci = 0, del = false;
+        // (en inglés son palabras clave que sí devuelven resultados en el buscador)
+        const PHRASES = {
+            es: ['renovar mi ITIN', 'cita en el consulado', 'placas para mi carro', 'seguro de auto', 'reparar mi pantalla', 'declarar mis impuestos', 'abrir mi LLC', 'un celular liberado'],
+            en: ['income tax', 'consulate appointment', 'title plates', 'car insurance', 'screen repair', 'immigration', 'business registration', 'unlocked phone']
+        };
+        const phraseSet = () => PHRASES[state.lang === 'es' ? 'es' : 'en'];
+        if (reduce) { typeEl.textContent = phraseSet()[0]; return; }
+        let pi = 0, ci = 0, del = false, typedLang = state.lang;
         const tick = () => {
             if (field.classList.contains('has-text') || document.activeElement === input || document.hidden) { setTimeout(tick, 700); return; }
-            const full = phrases[pi];
+            if (typedLang !== state.lang) { typedLang = state.lang; pi = ci = 0; del = false; } // cambió el idioma: empezar de nuevo
+            const phrases = phraseSet();
+            const full = phrases[pi % phrases.length];
             ci += del ? -1 : 1;
             typeEl.textContent = full.slice(0, ci);
             let d = del ? 26 : 64;
@@ -708,7 +751,7 @@
         const sync = () => {
             const playing = !v.paused;
             icon.className = playing ? 'ph-fill ph-pause' : 'ph-fill ph-play';
-            btn.setAttribute('aria-label', playing ? 'Pausar video' : 'Reproducir video');
+            btn.setAttribute('aria-label', playing ? T('Pausar video', 'Pause video') : T('Reproducir video', 'Play video'));
             btn.setAttribute('aria-pressed', String(!playing));
         };
         let loadedSrc = false, userPaused = reduce;
@@ -769,7 +812,7 @@
 
             const btn = $('#f-submit'), label = $('span', btn);
             const old = label.textContent;
-            label.textContent = 'Abriendo WhatsApp';
+            label.textContent = T('Abriendo WhatsApp', 'Opening WhatsApp');
             btn.disabled = true;
             $('#f-ok').hidden = false;
             const w = window.open(url, '_blank', 'noopener');
@@ -825,6 +868,160 @@
         }
     }
 
+    /* ---------- 11. Traducción automática (Google Website Translator) ---------- */
+    // El sitio se escribe solo en español; Google lo traduce en el navegador, así no hay dos versiones que mantener.
+    //  · Si el idioma del dispositivo no es español, se ofrece traducir (aviso discreto, una vez).
+    //  · El selector ES | EN del header cambia de idioma en cualquier momento.
+    //  · El script de Google solo se descarga cuando el visitante lo pide (o si ya había elegido traducir antes).
+    function initTranslate() {
+        const box = $('#lang'), bar = $('#tr-bar'), host = $('#google_translate_element');
+        if (!box || !bar || !host) return;
+        const SRC = 'es', KEY = 'wms-lang', SEEN = 'wms-lang-offered';
+        const store = {
+            get: () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } },
+            set: (v) => { try { localStorage.setItem(KEY, v); } catch (e) { } }
+        };
+
+        // Texto del aviso en el idioma del visitante: [mensaje, botón de traducir, botón de rechazar]. Si no hay, inglés.
+        const OFFER = {
+            en: ['This page is in Spanish. Would you like to translate it?', 'Translate', 'No, thanks'],
+            pt: ['Esta página está em espanhol. Deseja traduzi-la?', 'Traduzir', 'Não, obrigado'],
+            fr: ['Cette page est en espagnol. Voulez-vous la traduire ?', 'Traduire', 'Non, merci'],
+            de: ['Diese Seite ist auf Spanisch. Möchten Sie sie übersetzen?', 'Übersetzen', 'Nein, danke'],
+            it: ['Questa pagina è in spagnolo. Vuoi tradurla?', 'Traduci', 'No, grazie'],
+            vi: ['Trang này bằng tiếng Tây Ban Nha. Bạn có muốn dịch không?', 'Dịch', 'Không, cảm ơn'],
+            ko: ['이 페이지는 스페인어입니다. 번역하시겠습니까?', '번역', '아니요'],
+            'zh-CN': ['此页面为西班牙语。是否翻译？', '翻译', '不用了'],
+            'zh-TW': ['此頁面為西班牙文。是否翻譯？', '翻譯', '不用了']
+        };
+        const ERR = 'Translation is not available right now. Please try again later.';
+
+        // Idioma del navegador -> código de Google (es-MX -> es, zh-TW -> zh-TW, he -> iw)
+        const toGoogle = (tag) => {
+            const t = String(tag || '').toLowerCase(), b = t.split('-')[0];
+            if (b === 'zh') return /tw|hk|mo|hant/.test(t) ? 'zh-TW' : 'zh-CN';
+            return { he: 'iw', nb: 'no', nn: 'no', fil: 'tl' }[b] || b;
+        };
+        const deviceLang = () => toGoogle((navigator.languages && navigator.languages[0]) || navigator.language || SRC);
+
+        // Google deja la clase translated-ltr puesta aunque se vuelva al original; lo que sí cambia es <html lang>
+        const translated = () => /\btranslated-(ltr|rtl)\b/.test(root.className) && root.lang !== SRC;
+        const combo = () => host.querySelector('select.goog-te-combo');
+        const until = (test, ms) => new Promise((done) => {
+            const t0 = Date.now();
+            (function poll() { if (test()) done(true); else if (Date.now() - t0 > ms) done(false); else setTimeout(poll, 100); })();
+        });
+        const fire = (el) => el.dispatchEvent(new Event('change'));
+        const clearCookie = () => { // Google recuerda el idioma en la cookie googtrans
+            const past = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/', h = location.hostname;
+            document.cookie = past; document.cookie = `${past}; domain=${h}`; document.cookie = `${past}; domain=.${h}`;
+        };
+
+        // El script de Google se descarga la primera vez que hace falta y se reutiliza.
+        let loading = null;
+        const loadGoogle = () => loading || (loading = new Promise((ok, fail) => {
+            window.googleTranslateElementInit = () => {
+                try { new google.translate.TranslateElement({ pageLanguage: SRC, autoDisplay: false }, 'google_translate_element'); }
+                catch (e) { fail(e); return; }
+                until(() => combo() && combo().options.length > 1, 8000).then((found) => (found ? ok() : fail(new Error('selector de idiomas no disponible'))));
+            };
+            const s = document.createElement('script');
+            s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            s.async = true;
+            s.onerror = () => fail(new Error('no se pudo cargar el script de Google'));
+            document.head.appendChild(s);
+            setTimeout(() => fail(new Error('Google tardó demasiado')), 12000);
+        })).catch((e) => { loading = null; throw e; });
+
+        // Selector ES | EN (+ un tercer botón si se tradujo a otro idioma)
+        const extra = $('#lang-x');
+        const paint = () => {
+            const known = state.lang === SRC || state.lang === 'en';
+            extra.hidden = known;
+            if (!known) { extra.dataset.lang = state.lang; extra.lang = state.lang; extra.textContent = state.lang.split('-')[0].toUpperCase(); extra.setAttribute('aria-label', state.lang); }
+            $$('.lang-b', box).forEach((b) => {
+                const on = b.dataset.lang === state.lang;
+                b.classList.toggle('is-on', on);
+                b.setAttribute('aria-pressed', String(on));
+            });
+        };
+
+        // Al traducir cambia el largo de los textos: hay que volver a medir los bloques fijados por GSAP
+        const relayout = () => [700, 2200].forEach((ms) => setTimeout(() => { if (animate) ScrollTrigger.refresh(); if (lenis) lenis.resize(); }, ms));
+
+        async function translateTo(code) {
+            flattenWords(); // antes de cargar Google: si ya hay cookie de idioma, traduce apenas inicia
+            await loadGoogle();
+            const sel = combo();
+            if (![...sel.options].some((o) => o.value === code)) code = 'en'; // idioma que Google no ofrece: inglés
+            sel.value = code; fire(sel);
+            if (!(await until(translated, 2500))) { sel.value = code; fire(sel); } // a veces el primer cambio se pierde
+            if (!(await until(translated, 6000))) throw new Error('Google no tradujo la página');
+            state.lang = code; store.set(code); relayout();
+        }
+        async function restore() {
+            store.set(SRC); clearCookie();
+            const sel = combo();
+            if (translated() && sel && [...sel.options].some((o) => o.value === SRC)) {
+                sel.value = SRC; fire(sel); // elegir el idioma original en el selector de Google restaura el texto
+                if (await until(() => !translated(), 3000)) { clearCookie(); state.lang = SRC; restoreWords(); relayout(); return; }
+            }
+            if (translated()) { clearCookie(); location.reload(); return; } // plan B: recargar el original
+            state.lang = SRC; restoreWords(); relayout();
+        }
+
+        let busy = false;
+        async function go(code) {
+            if (busy || !code || code === state.lang) return;
+            busy = true; box.classList.add('is-busy');
+            try { await (code === SRC ? restore() : translateTo(code)); }
+            catch (e) { console.warn('translate', e); say(null); }
+            busy = false; box.classList.remove('is-busy'); paint();
+        }
+
+        // Aviso (también se usa para avisar que la traducción falló)
+        const msg = $('#tr-msg'), yes = $('#tr-yes'), no = $('#tr-no');
+        let offered = null, hideTimer = 0, hideEnd = 0;
+        function say(code) {
+            const err = !code, key = !err && (OFFER[code] ? code : OFFER[code.split('-')[0]] ? code.split('-')[0] : 'en');
+            const txt = err ? OFFER.en : OFFER[key];
+            bar.lang = err ? 'en' : key;
+            msg.textContent = err ? ERR : txt[0];
+            yes.textContent = txt[1]; yes.hidden = err;
+            no.textContent = err ? 'OK' : txt[2];
+            offered = code;
+            clearTimeout(hideEnd); // por si un hide() anterior todavía iba a ocultarlo
+            bar.hidden = false;
+            requestAnimationFrame(() => requestAnimationFrame(() => bar.classList.add('is-in')));
+            clearTimeout(hideTimer); hideTimer = setTimeout(hide, err ? 8000 : 22000);
+        }
+        function hide() {
+            clearTimeout(hideTimer); bar.classList.remove('is-in');
+            clearTimeout(hideEnd); hideEnd = setTimeout(() => { bar.hidden = true; }, 700);
+        }
+
+        yes.addEventListener('click', () => { hide(); go(offered); });
+        no.addEventListener('click', () => { hide(); if (offered) store.set(SRC); }); // "no, gracias": no se vuelve a ofrecer
+        box.addEventListener('click', (e) => { const b = e.target.closest('.lang-b'); if (b) { hide(); go(b.dataset.lang); } });
+        addEventListener('keydown', (e) => { if (e.key === 'Escape' && !bar.hidden) hide(); });
+
+        // Arranque: ¿ya había elegido idioma? ¿el dispositivo está en otro idioma?
+        box.hidden = false;
+        const saved = store.get();
+        if (saved && saved !== SRC) go(saved);
+        else if (!saved) {
+            const dev = deviceLang();
+            let seen = false; try { seen = !!sessionStorage.getItem(SEEN); } catch (e) { }
+            if (dev !== SRC && !seen) {
+                offerTranslate = () => {
+                    try { sessionStorage.setItem(SEEN, '1'); } catch (e) { }
+                    if (state.lang === SRC && !translated()) say(dev);
+                };
+            }
+        }
+        paint();
+    }
+
     /* ---------- Arranque ---------- */
     function prepareText() {
         const el = $('[data-words]');
@@ -839,6 +1036,7 @@
         started = true;
         initScroll();
         heroIntro();
+        if (offerTranslate) setTimeout(offerTranslate, 2400); // el aviso de traducción espera a que el hero termine de entrar
     }
 
     function boot() {
@@ -852,6 +1050,7 @@
             $$('[data-reveal]').forEach((n) => { n.style.opacity = 1; n.style.transform = 'none'; });
         }
         initFinder(); initOffices(); initFaq(); initVideo(); initForm(); initWaTip(); initPointerFx();
+        try { initTranslate(); } catch (e) { console.warn('translate', e); }
         runLoader();
         if (animate) {
             addEventListener('load', () => ScrollTrigger.refresh());
